@@ -1,6 +1,6 @@
 pragma solidity >=0.5.16;
 
-interface IPancakeRouter01 {
+interface IBuddhaRouter01 {
     function factory() external pure returns (address);
 
     function WETH() external pure returns (address);
@@ -148,7 +148,13 @@ interface IPancakeRouter01 {
         uint256 reserveOut
     ) external pure returns (uint256 amountIn);
 
-    function getAmountsOut(uint256 amountIn, address[] calldata path) external view returns (uint256[] memory amounts);
+    function getAmountsOut(uint256 amountIn, address[] calldata path)
+        external
+        view
+        returns (uint256[] memory amounts);
 
-    function getAmountsIn(uint256 amountOut, address[] calldata path) external view returns (uint256[] memory amounts);
+    function getAmountsIn(uint256 amountOut, address[] calldata path)
+        external
+        view
+        returns (uint256[] memory amounts);
 }

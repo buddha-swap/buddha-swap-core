@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0;
 
-interface IPancakeMigrator {
+interface IBuddhaMigrator {
     function migrate(
         address token,
         uint256 amountTokenMin,

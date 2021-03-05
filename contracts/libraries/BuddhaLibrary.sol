@@ -1,17 +1,23 @@
 pragma solidity >=0.5.16;
 
-import '../interfaces/IPancakePair.sol';
+import "../interfaces/IBuddhaPair.sol";
 
-import './SafeMath.sol';
+import "./SafeMath.sol";
 
-library PancakeLibrary {
+library BuddhaLibrary {
     using SafeMath for uint256;
 
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
-    function sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
-        require(tokenA != tokenB, 'PancakeLibrary: IDENTICAL_ADDRESSES');
-        (token0, token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-        require(token0 != address(0), 'PancakeLibrary: ZERO_ADDRESS');
+    function sortTokens(address tokenA, address tokenB)
+        internal
+        pure
+        returns (address token0, address token1)
+    {
+        require(tokenA != tokenB, "BuddhaLibrary: IDENTICAL_ADDRESSES");
+        (token0, token1) = tokenA < tokenB
+            ? (tokenA, tokenB)
+            : (tokenB, tokenA);
+        require(token0 != address(0), "BuddhaLibrary: ZERO_ADDRESS");
     }
 
     // calculates the CREATE2 address for a pair without making any external calls
@@ -25,10 +31,10 @@ library PancakeLibrary {
             uint256(
                 keccak256(
                     abi.encodePacked(
-                        hex'ff',
+                        hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex'd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66' // init code hash
+                        hex"80a7b484e90db1d780125994f2d4e968231f89a26b065dbaddec09b68b2f5531" // init code hash
                     )
                 )
             )
@@ -43,8 +49,11 @@ library PancakeLibrary {
     ) internal view returns (uint256 reserveA, uint256 reserveB) {
         (address token0, ) = sortTokens(tokenA, tokenB);
         pairFor(factory, tokenA, tokenB);
-        (uint256 reserve0, uint256 reserve1, ) = IPancakePair(pairFor(factory, tokenA, tokenB)).getReserves();
-        (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+        (uint256 reserve0, uint256 reserve1, ) =
+            IBuddhaPair(pairFor(factory, tokenA, tokenB)).getReserves();
+        (reserveA, reserveB) = tokenA == token0
+            ? (reserve0, reserve1)
+            : (reserve1, reserve0);
     }
 
     // given some amount of an asset and pair reserves, returns an equivalent amount of the other asset
@@ -53,8 +62,11 @@ library PancakeLibrary {
         uint256 reserveA,
         uint256 reserveB
     ) internal pure returns (uint256 amountB) {
-        require(amountA > 0, 'PancakeLibrary: INSUFFICIENT_AMOUNT');
-        require(reserveA > 0 && reserveB > 0, 'PancakeLibrary: INSUFFICIENT_LIQUIDITY');
+        require(amountA > 0, "BuddhaLibrary: INSUFFICIENT_AMOUNT");
+        require(
+            reserveA > 0 && reserveB > 0,
+            "BuddhaLibrary: INSUFFICIENT_LIQUIDITY"
+        );
         amountB = amountA.mul(reserveB) / reserveA;
     }
 
@@ -64,8 +76,11 @@ library PancakeLibrary {
         uint256 reserveIn,
         uint256 reserveOut
     ) internal pure returns (uint256 amountOut) {
-        require(amountIn > 0, 'PancakeLibrary: INSUFFICIENT_INPUT_AMOUNT');
-        require(reserveIn > 0 && reserveOut > 0, 'PancakeLibrary: INSUFFICIENT_LIQUIDITY');
+        require(amountIn > 0, "BuddhaLibrary: INSUFFICIENT_INPUT_AMOUNT");
+        require(
+            reserveIn > 0 && reserveOut > 0,
+            "BuddhaLibrary: INSUFFICIENT_LIQUIDITY"
+        );
         uint256 amountInWithFee = amountIn.mul(998);
         uint256 numerator = amountInWithFee.mul(reserveOut);
         uint256 denominator = reserveIn.mul(1000).add(amountInWithFee);
@@ -78,8 +93,11 @@ library PancakeLibrary {
         uint256 reserveIn,
         uint256 reserveOut
     ) internal pure returns (uint256 amountIn) {
-        require(amountOut > 0, 'PancakeLibrary: INSUFFICIENT_OUTPUT_AMOUNT');
-        require(reserveIn > 0 && reserveOut > 0, 'PancakeLibrary: INSUFFICIENT_LIQUIDITY');
+        require(amountOut > 0, "BuddhaLibrary: INSUFFICIENT_OUTPUT_AMOUNT");
+        require(
+            reserveIn > 0 && reserveOut > 0,
+            "BuddhaLibrary: INSUFFICIENT_LIQUIDITY"
+        );
         uint256 numerator = reserveIn.mul(amountOut).mul(1000);
         uint256 denominator = reserveOut.sub(amountOut).mul(998);
         amountIn = (numerator / denominator).add(1);
@@ -91,11 +109,12 @@ library PancakeLibrary {
         uint256 amountIn,
         address[] memory path
     ) internal view returns (uint256[] memory amounts) {
-        require(path.length >= 2, 'PancakeLibrary: INVALID_PATH');
+        require(path.length >= 2, "BuddhaLibrary: INVALID_PATH");
         amounts = new uint256[](path.length);
         amounts[0] = amountIn;
         for (uint256 i; i < path.length - 1; i++) {
-            (uint256 reserveIn, uint256 reserveOut) = getReserves(factory, path[i], path[i + 1]);
+            (uint256 reserveIn, uint256 reserveOut) =
+                getReserves(factory, path[i], path[i + 1]);
             amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut);
         }
     }
@@ -106,11 +125,12 @@ library PancakeLibrary {
         uint256 amountOut,
         address[] memory path
     ) internal view returns (uint256[] memory amounts) {
-        require(path.length >= 2, 'PancakeLibrary: INVALID_PATH');
+        require(path.length >= 2, "BuddhaLibrary: INVALID_PATH");
         amounts = new uint256[](path.length);
         amounts[amounts.length - 1] = amountOut;
         for (uint256 i = path.length - 1; i > 0; i--) {
-            (uint256 reserveIn, uint256 reserveOut) = getReserves(factory, path[i - 1], path[i]);
+            (uint256 reserveIn, uint256 reserveOut) =
+                getReserves(factory, path[i - 1], path[i]);
             amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut);
         }
     }

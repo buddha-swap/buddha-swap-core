@@ -1,20 +1,20 @@
 pragma solidity >=0.6.6;
 
-import '@uniswap/lib/contracts/libraries/TransferHelper.sol';
+import "@uniswap/lib/contracts/libraries/TransferHelper.sol";
 
-import './interfaces/IPancakeMigrator.sol';
-import './interfaces/V1/IUniswapV1Factory.sol';
-import './interfaces/V1/IUniswapV1Exchange.sol';
-import './interfaces/IPancakeRouter01.sol';
-import './interfaces/IERC20.sol';
+import "./interfaces/IBuddhaMigrator.sol";
+import "./interfaces/V1/IUniswapV1Factory.sol";
+import "./interfaces/V1/IUniswapV1Exchange.sol";
+import "./interfaces/IBuddhaRouter01.sol";
+import "./interfaces/IERC20.sol";
 
-contract PancakeMigrator is IPancakeMigrator {
+contract BuddhaMigrator is IBuddhaMigrator {
     IUniswapV1Factory immutable factoryV1;
-    IPancakeRouter01 immutable router;
+    IBuddhaRouter01 immutable router;
 
     constructor(address _factoryV1, address _router) public {
         factoryV1 = IUniswapV1Factory(_factoryV1);
-        router = IPancakeRouter01(_router);
+        router = IBuddhaRouter01(_router);
     }
 
     // needs to accept ETH from any v1 exchange and the router. ideally this could be enforced, as in the router,
@@ -28,10 +28,15 @@ contract PancakeMigrator is IPancakeMigrator {
         address to,
         uint256 deadline
     ) external override {
-        IUniswapV1Exchange exchangeV1 = IUniswapV1Exchange(factoryV1.getExchange(token));
+        IUniswapV1Exchange exchangeV1 =
+            IUniswapV1Exchange(factoryV1.getExchange(token));
         uint256 liquidityV1 = exchangeV1.balanceOf(msg.sender);
-        require(exchangeV1.transferFrom(msg.sender, address(this), liquidityV1), 'TRANSFER_FROM_FAILED');
-        (uint256 amountETHV1, uint256 amountTokenV1) = exchangeV1.removeLiquidity(liquidityV1, 1, 1, uint256(-1));
+        require(
+            exchangeV1.transferFrom(msg.sender, address(this), liquidityV1),
+            "TRANSFER_FROM_FAILED"
+        );
+        (uint256 amountETHV1, uint256 amountTokenV1) =
+            exchangeV1.removeLiquidity(liquidityV1, 1, 1, uint256(-1));
         TransferHelper.safeApprove(token, address(router), amountTokenV1);
         (uint256 amountTokenV2, uint256 amountETHV2, ) =
             router.addLiquidityETH{value: amountETHV1}(
@@ -44,10 +49,17 @@ contract PancakeMigrator is IPancakeMigrator {
             );
         if (amountTokenV1 > amountTokenV2) {
             TransferHelper.safeApprove(token, address(router), 0); // be a good blockchain citizen, reset allowance to 0
-            TransferHelper.safeTransfer(token, msg.sender, amountTokenV1 - amountTokenV2);
+            TransferHelper.safeTransfer(
+                token,
+                msg.sender,
+                amountTokenV1 - amountTokenV2
+            );
         } else if (amountETHV1 > amountETHV2) {
             // addLiquidityETH guarantees that all of amountETHV1 or amountTokenV1 will be used, hence this else is safe
-            TransferHelper.safeTransferETH(msg.sender, amountETHV1 - amountETHV2);
+            TransferHelper.safeTransferETH(
+                msg.sender,
+                amountETHV1 - amountETHV2
+            );
         }
     }
 }

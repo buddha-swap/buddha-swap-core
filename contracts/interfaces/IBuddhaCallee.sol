@@ -1,6 +1,6 @@
 pragma solidity >=0.5.16;
 
-interface IPancakeCallee {
+interface IBuddhaCallee {
     function pancakeCall(
         address sender,
         uint256 amount0,

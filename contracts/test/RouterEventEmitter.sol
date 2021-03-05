@@ -1,6 +1,6 @@
 pragma solidity >=0.5.16;
 
-import '../interfaces/IPancakeRouter01.sol';
+import "../interfaces/IBuddhaRouter01.sol";
 
 contract RouterEventEmitter {
     event Amounts(uint256[] amounts);
@@ -18,7 +18,7 @@ contract RouterEventEmitter {
         (bool success, bytes memory returnData) =
             router.delegatecall(
                 abi.encodeWithSelector(
-                    IPancakeRouter01(router).swapExactTokensForTokens.selector,
+                    IBuddhaRouter01(router).swapExactTokensForTokens.selector,
                     amountIn,
                     amountOutMin,
                     path,
@@ -41,7 +41,7 @@ contract RouterEventEmitter {
         (bool success, bytes memory returnData) =
             router.delegatecall(
                 abi.encodeWithSelector(
-                    IPancakeRouter01(router).swapTokensForExactTokens.selector,
+                    IBuddhaRouter01(router).swapTokensForExactTokens.selector,
                     amountOut,
                     amountInMax,
                     path,
@@ -63,7 +63,7 @@ contract RouterEventEmitter {
         (bool success, bytes memory returnData) =
             router.delegatecall(
                 abi.encodeWithSelector(
-                    IPancakeRouter01(router).swapExactETHForTokens.selector,
+                    IBuddhaRouter01(router).swapExactETHForTokens.selector,
                     amountOutMin,
                     path,
                     to,
@@ -85,7 +85,7 @@ contract RouterEventEmitter {
         (bool success, bytes memory returnData) =
             router.delegatecall(
                 abi.encodeWithSelector(
-                    IPancakeRouter01(router).swapTokensForExactETH.selector,
+                    IBuddhaRouter01(router).swapTokensForExactETH.selector,
                     amountOut,
                     amountInMax,
                     path,
@@ -108,7 +108,7 @@ contract RouterEventEmitter {
         (bool success, bytes memory returnData) =
             router.delegatecall(
                 abi.encodeWithSelector(
-                    IPancakeRouter01(router).swapExactTokensForETH.selector,
+                    IBuddhaRouter01(router).swapExactTokensForETH.selector,
                     amountIn,
                     amountOutMin,
                     path,
@@ -130,7 +130,7 @@ contract RouterEventEmitter {
         (bool success, bytes memory returnData) =
             router.delegatecall(
                 abi.encodeWithSelector(
-                    IPancakeRouter01(router).swapETHForExactTokens.selector,
+                    IBuddhaRouter01(router).swapETHForExactTokens.selector,
                     amountOut,
                     path,
                     to,
